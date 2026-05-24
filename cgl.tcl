@@ -1,6 +1,6 @@
-set size_y 40
-set size_x 40
-set delay 0
+set size_y 19
+set size_x 78
+set delay 100
 set grid ""
 set cycle 0
 
@@ -42,7 +42,7 @@ proc print_grid {} {
 		puts -nonewline "="
 	}
 	puts ""
-	puts "Implemented in TCL, Philip Geramian 2026"
+	puts "Implemented in Tcl, Philip Geramian 2026"
 }
 
 proc update_grid {} {
