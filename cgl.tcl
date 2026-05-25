@@ -1,8 +1,15 @@
+#Grid size
 set size_y 19
 set size_x 78
-set delay 100
+#Delay between generations in ms
+set delay 100 
+#Set to 1 to allow wrapping, 0 to not
+set wrap 1 
+
+#Storage
 set grid ""
 set cycle 0
+
 
 proc gen_grid {} {
 	upvar grid _grid
@@ -26,7 +33,7 @@ proc print_grid {} {
 	for {set i 0} {$i<$_x-27-[string length $_cycle]} {incr i} {
 		puts -nonewline " "
 	}
-	puts "cycle: $_cycle"
+	puts "Cycle: $_cycle"
 	for {set i 0} {$i<$_x+2} {incr i} {
 		puts -nonewline "="
 	}
@@ -50,55 +57,56 @@ proc update_grid {} {
 	upvar size_y _y
 	upvar size_x _x
 	upvar cycle _cycle
+	upvar wrap _wrap
 	set new_grid ""
 	for {set y 0} {$y<$_y} {incr y} {
 		set row ""
 		for {set x 0} {$x<$_x} {incr x} {
 			set neighbors 0
-			#If we are the first row, don't look above
-			if {[expr {$y!=0}]} {
-				#If we are the first element, don't look left
-				if {[expr {$x!=0}]} {
-					if {[string equal "*" [lindex $_grid [expr {$y-1}] [expr {$x-1}]]]} {
+			#If we are the first row, don't look above, unless wrapping
+			if {[expr {$y!=0}] || $_wrap} {
+				#If we are the first element, don't look left, unless wrapping
+				if {[expr {$x!=0}] || $_wrap} {
+					if {[string equal "*" [lindex $_grid [expr {[expr {$y==0}] && $_wrap} ? [expr {$_y-1}] : [expr {$y-1}]] [expr {[expr {$x==0}] && $_wrap} ? [expr {$_x-1}] : [expr {$x-1}]]]]} {
 						incr neighbors
 					}
 				}
-				if {[string equal "*" [lindex $_grid [expr {$y-1}] $x]]} {
+				if {[string equal "*" [lindex $_grid [expr {[expr {$y==0}] && $_wrap} ? [expr {$_y-1}] : [expr {$y-1}]] $x]]} {
 					incr neighbors
 				}
-				#If we are the last element, don't look right
-				if {[expr {$x!=$_x-1}]} {
-					if {[string equal "*" [lindex $_grid [expr {$y-1}] [expr {$x+1}]]]} {
+				#If we are the last element, don't look right, unless wrapping
+				if {[expr {$x!=$_x-1}] || $_wrap} {
+					if {[string equal "*" [lindex $_grid [expr {[expr {$y==0}] && $_wrap} ? [expr {$_y-1}] : [expr {$y-1}]] [expr {[expr {$x==$_x-1}] && $_wrap} ? 0 : [expr {$x+1}]]]]} {
 						incr neighbors
 					}
 				}
 			}
-			#If we are the first element, don't look left
-			if {[expr {$x!=0}]} {
-				if {[string equal "*" [lindex $_grid [expr {$y}] [expr {$x-1}]]]} {
+			#If we are the first element, don't look left, unless wrapping
+			if {[expr {$x!=0} || $_wrap]} {
+				if {[string equal "*" [lindex $_grid [expr {$y}] [expr {[expr {$x==0}] && $_wrap} ? [expr {$_x-1}] : [expr {$x-1}]]]]} {
 					incr neighbors
 				}
 			}
-			#If we are the last element, don't look right
-			if {[expr {$x!=$_x-1}]} {
-				if {[string equal "*" [lindex $_grid $y [expr {$x+1}]]]} {
+			#If we are the last element, don't look right, unless wrapping
+			if {[expr {$x!=$_x-1} || $_wrap]} {
+				if {[string equal "*" [lindex $_grid $y [expr {[expr {$x==$_x-1}] && $_wrap} ? 0 : [expr {$x+1}]]]]} {
 					incr neighbors
 				}
 			}
-			#If we are the last row, don't look below
-			if {[expr {$y!=$_y-1}]} {
-				#If we are the first element, don't look left
-				if {[expr {$x!=0}]} {
-					if {[string equal "*" [lindex $_grid [expr {$y+1}] [expr {$x-1}]]]} {
+			#If we are the bottom row, don't look below, unless wrapping
+			if {[expr {$y!=$_y-1}] || $_wrap} {
+				#If we are the first element, don't look left, unless wrapping
+				if {[expr {$x!=0}] || $_wrap} {
+					if {[string equal "*" [lindex $_grid [expr {[expr {$y==$_y-1}] && $_wrap} ? 0 : [expr {$y+1}]] [expr {[expr {$x==0}] && $_wrap} ? [expr {$_x-1}] : [expr {$x-1}]]]]} {
 						incr neighbors
 					}
 				}
-				if {[string equal "*" [lindex $_grid [expr {$y+1}] $x]]} {
+				if {[string equal "*" [lindex $_grid [expr {[expr {$y==$_y-1}] && $_wrap} ? 0 : [expr {$y+1}]] $x]]} {
 					incr neighbors
 				}
-				#If we are the last element, don't look right
-				if {[expr {$x!=$_x-1}]} {
-					if {[string equal "*" [lindex $_grid [expr {$y+1}] [expr {$x+1}]]]} {
+				#If we are the last element, don't look right, unless wrapping
+				if {[expr {$x!=$_x-1}] || $_wrap} {
+					if {[string equal "*" [lindex $_grid [expr {[expr {$y==$_y-1}] && $_wrap} ? 0 : [expr {$y+1}]] [expr {[expr {$x==$_x-1}] && $_wrap} ? 0 : [expr {$x+1}]]]]} {
 						incr neighbors
 					}
 				}
